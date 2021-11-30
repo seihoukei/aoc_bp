@@ -12,8 +12,19 @@ window.onload = async () => {
         document.getElementById("year").innerText = YEAR
         document.getElementById("day").innerText = DAY
 
+        performance.mark("start")
         const answer = solver(data)
+        performance.mark("end")
+
+        // to use in solver.js:
+        // performance.measure("Total execution time", "start"
+        performance.measure("Total execution time", "start", "end")
         document.getElementById("answer").innerText = answer
+
+        document.getElementById("time").innerText = performance
+            .getEntriesByType("measure")
+            .map(x => `${x.name} = ${x.duration.toFixed(2)}`)
+            .join("\n")
 
     } catch(e) {
         document.getElementById("error").innerText = e

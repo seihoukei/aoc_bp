@@ -16,6 +16,10 @@ body {
     font : 16px "Share Tech Mono", monospace;
 }
 
+div {
+    padding : 5px;
+}
+
 div:empty {
     display:none;
 }
@@ -28,7 +32,14 @@ div:empty {
     content: "Answer: ";
 }
 
+#time:not(:empty)::before {
+    content: "Performance: \00000a";
+}
+
+#time {
+    white-space: pre;
+}
+
 .day {
     font-size : 24px;
-    padding : 5px 0 10px 0;
 }
