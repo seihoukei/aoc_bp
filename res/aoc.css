@@ -24,6 +24,10 @@ div:empty {
     display:none;
 }
 
+#file:not(:empty)::before {
+    content: "Input file: ";
+}
+
 #error:not(:empty)::before {
     content: "Error: ";
 }

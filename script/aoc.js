@@ -1,8 +1,14 @@
 const SOLVER = "solver.js"
+const DEFAULT_INPUT = "input.txt"
 
 window.onload = async () => {
     try {
-        const file = await fetch(`../data/${YEAR}/${DAY}/${INPUT}`)
+        let file = await fetch(`../data/${YEAR}/${DAY}/${INPUT}`)
+        if (file.status === 404) {
+            console.log("Input file not found, trying default")
+            file = await fetch(`../data/${YEAR}/${DAY}/${DEFAULT_INPUT}`)
+        }
+
         const data = (await file.text()).trim().split(`\n`)
         console.log("Input data: ", data)
 
@@ -10,6 +16,7 @@ window.onload = async () => {
 
         document.getElementById("year").innerText = YEAR
         document.getElementById("day").innerText = DAY
+        document.getElementById("file").innerText = new URL(file.url).pathname
 
         performance.mark("start")
         const answer = solver(data)
