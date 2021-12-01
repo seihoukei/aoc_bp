@@ -1,4 +1,3 @@
-const INPUT = "input.txt"
 const SOLVER = "solver.js"
 
 window.onload = async () => {
