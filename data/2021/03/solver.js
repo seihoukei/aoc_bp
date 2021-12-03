@@ -1,12 +1,11 @@
 class Counter {
-    amounts = []
-
     constructor(data) {
         for (let input of data)
             this.calculate(input.trim())
     }
 
     calculate(bits) {
+        this.amounts ??= []
         for (let i = 0; i < bits.length; i++) {
             this.amounts[i] = (this.amounts[i] ?? 0) + (bits[i] === "1" ? 1 : -1)
         }
@@ -16,24 +15,22 @@ class Counter {
         return this.amounts.map(x => (x > 0 ^ reverse) ? "1" : "0").join("")
     }
 
-    get gamma() {
+    get maxBits() {
         return parseInt(this.getBinary(), 2)
     }
 
-    get epsilon() {
+    get minBits() {
         return parseInt(this.getBinary(true), 2)
     }
 }
 
-class Scanner {
-    entries = {}
+class Scanner extends Counter{
+    calculate(bits) {
+        this.entries ??= {}
 
-    constructor(data) {
-        for (let input of data) {
-            for (let i = 0; i < input.length; i++) {
-                const entry = input.slice(0, i+1)
-                this.entries[entry] = (this.entries[entry] ?? 0) + 1
-            }
+        for (let i = 0; i < bits.length; i++) {
+            const entry = bits.slice(0, i+1)
+            this.entries[entry] = (this.entries[entry] ?? 0) + 1
         }
     }
 
@@ -62,24 +59,16 @@ class Scanner {
 
         return value
     }
-
-    get oxygen() {
-        return parseInt(this.getBinary(), 2)
-    }
-
-    get co2() {
-        return parseInt(this.getBinary(true), 2)
-    }
 }
 
 export function part1 (data) {
     const counter = new Counter(data)
 
-    return counter.gamma * counter.epsilon
+    return counter.maxBits * counter.minBits
 }
 
 export function part2 (data) {
     const scanner = new Scanner(data)
 
-    return scanner.oxygen * scanner.co2
+    return scanner.maxBits * scanner.minBits
 }
