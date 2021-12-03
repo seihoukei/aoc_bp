@@ -1,39 +1,68 @@
 const SOLVER = "solver.js"
-const DEFAULT_INPUT = "input.txt"
+const INPUTS = [
+    "mini.txt",
+    "input.txt",
+    "custom.txt",
+]
+
+class DOM {
+    static createElement(typ = "div", clas, parent, text) {
+        let element = document.createElement(typ)
+        if (clas !== undefined) element.className = clas
+        if (text !== undefined) element.innerText = text
+        if (parent) parent.appendChild(element)
+        return element
+    }
+
+    static createDiv(parent, clas, text) {
+        return this.createElement("div", clas, parent, text)
+    }
+}
 
 window.onload = async () => {
-    try {
-        let file = await fetch(`../data/${YEAR}/${DAY}/${INPUT}`)
+    document.getElementById("year").innerText = YEAR
+    document.getElementById("day").innerText = DAY
+
+    for (let input of INPUTS) {
+        let file = await fetch(`../data/${YEAR}/${DAY}/${input}`)
         if (file.status === 404) {
-            console.log("Input file not found, trying default")
-            file = await fetch(`../data/${YEAR}/${DAY}/${DEFAULT_INPUT}`)
+            continue
         }
 
-        const data = (await file.text()).trim().split(`\n`)
-        console.log("Input data: ", data)
+        const raw = await file.text()
+        const data = raw.trim().split(/\r?\n/)
 
-        const solver = (await import(`../data/${YEAR}/${DAY}/${SOLVER}`)).default
+        const solver = (await import(`../data/${YEAR}/${DAY}/${SOLVER}`))
 
-        document.getElementById("year").innerText = YEAR
-        document.getElementById("day").innerText = DAY
-        document.getElementById("file").innerText = new URL(file.url).pathname
+        const dvInput = DOM.createDiv(document.body, "input")
+        DOM.createDiv(dvInput,"file", new URL(file.url).pathname)
 
-        performance.mark("start")
-        const answer = solver(data)
-        performance.mark("end")
 
-        // to use in solver.js:
-        // performance.measure("Total execution time", "start"
-        performance.measure("Total execution time", "start", "end")
-        document.getElementById("answer").innerText = answer
+        for (let i = 1; i < 3; i++) {
+            performance.clearMarks()
+            performance.clearMeasures()
 
-        document.getElementById("time").innerText = performance
-            .getEntriesByType("measure")
-            .map(x => `${x.name} = ${x.duration.toFixed(2)}`)
-            .join("\n")
+            try {
+                performance.mark("start")
+                const answer = solver[`part${i}`](data, raw)
+                performance.mark("end")
 
-    } catch(e) {
-        document.getElementById("error").innerText = e
+                DOM.createDiv(dvInput, `answer part${i}`, answer)
 
+                // to use in solver.js:
+                // performance.measure("Total execution time", "start"
+                performance.measure("Total execution time", "start", "end")
+
+                DOM.createDiv(dvInput, `time`, performance
+                    .getEntriesByType("measure")
+                    .map(x => `${x.name} = ${x.duration.toFixed(2)}`)
+                    .join("\n")
+                )
+
+            } catch (e) {
+                DOM.createDiv(dvInput, `error part${i}`, e)
+
+            }
+        }
     }
 }

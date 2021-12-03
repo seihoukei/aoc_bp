@@ -24,23 +24,23 @@ div:empty {
     display:none;
 }
 
-#file:not(:empty)::before {
+.file:not(:empty)::before {
     content: "Input file: ";
 }
 
-#error:not(:empty)::before {
-    content: "Error: ";
+.part1:not(:empty)::before {
+    content: "Part 1: ";
 }
 
-#answer:not(:empty)::before {
-    content: "Answer: ";
+.part2:not(:empty)::before {
+    content: "Part 2: ";
 }
 
-#time:not(:empty)::before {
+.time:not(:empty)::before {
     content: "Performance: \00000a";
 }
 
-#time {
+.time {
     white-space: pre;
 }
 
