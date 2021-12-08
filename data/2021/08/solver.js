@@ -54,34 +54,29 @@ class Solver2 extends Solver {
 
             segments[6] = value
             segments[4] = segments[46] & ~value
-
             break
         }
 
         for (let input of inputs) {
             let value = input & segments[13]
 
-            if (value === 0 || value === segments[13])
+            if (value === 0 || value === segments[13] || (input & digits[1]) === digits[1])
                 continue
 
-            if ((input & digits[1]) !== digits[1]) {
-                segments[3] = value
-                segments[1] = segments[13] & ~segments[3]
-                break
-            }
+            segments[3] = value
+            segments[1] = segments[13] & ~segments[3]
+            break
         }
 
         for (let input of inputs) {
             let value = input & digits[1]
 
-            if (value === 0 || value === digits[1])
+            if (value === 0 || value === digits[1] || !(input & segments[1]))
                 continue
 
-            if (input & segments[1]) {
-                segments[5] = value
-                segments[2] = digits[1] & ~value
-                break
-            }
+            segments[5] = value
+            segments[2] = digits[1] & ~value
+            break
         }
 
         const digitCodes = [
