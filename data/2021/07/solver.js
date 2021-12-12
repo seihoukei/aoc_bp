@@ -24,6 +24,7 @@ class Solver {
 
             costs.push(cost)
         }
+
         return Math.min(...costs)
     }
 }
