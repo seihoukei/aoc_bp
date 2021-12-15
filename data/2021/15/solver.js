@@ -35,22 +35,25 @@ class Solver2 extends Solver {
     }
 
     get result() {
+        const dirs = [[-1,0],[1,0],[0,1],[0,-1]]
         const costs = this.map.map(x => x.map(x => Infinity))
-        let horizon = new Set([[this.map[0].length - 1, this.map.length - 1]])
+        let horizon = []
+        let nextHorizon = [[this.map[0].length - 1, this.map.length - 1]]
         costs[this.map.length-1][this.map[0].length - 1] = 0
-        while (horizon.size > 0) {
-            const nextHorizon = new Set()
+        while (nextHorizon.length > 0) {
+            [horizon, nextHorizon] = [nextHorizon, horizon]
+            nextHorizon.length = 0
             for (let [x,y] of horizon) {
-                for (let [dx, dy] of [[-1,0],[1,0],[0,1],[0,-1]]) {
+                const cost = costs[y][x] + this.map[y][x]
+                for (let [dx, dy] of dirs) {
                     if (this.map[y + dy]?.[x + dx] === undefined)
                         continue
-                    if (costs[y + dy][x+dx] <= costs[y][x] + this.map[y][x])
+                    if (costs[y + dy][x + dx] <= cost)
                         continue
-                    costs[y + dy][x+dx] = costs[y][x] + this.map[y][x]
-                    nextHorizon.add([x+dx,y+dy])
+                    costs[y + dy][x + dx] = cost
+                    nextHorizon.push([x+dx,y+dy])
                 }
             }
-            horizon = nextHorizon
         }
         return costs[0][0]
     }
