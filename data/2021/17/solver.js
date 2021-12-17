@@ -18,7 +18,12 @@ class Solver2 extends Solver {
     }
 
     getDx(step, x) {
-        return x / step + (step - 1) / 2
+        const dx = x / step + (step - 1) / 2
+        if (dx >= step)
+            return dx
+        const d = 1 + 8 * x
+        const dx2 = (-1 + d ** 0.5) / 2
+        return dx2
     }
 
     get result() {
@@ -27,10 +32,14 @@ class Solver2 extends Solver {
         for (let dy = +this.y0; dy < -this.y0; dy++) {
             const start = Math.ceil(this.getStep(dy, +this.y1))
             const end = Math.floor(this.getStep(dy, +this.y0))
+            let last = Infinity
             for (let step = start; step <= end; step++) {
-                const right = Math.floor(this.getDx(step, +this.x1))
+                const right = Math.min(last - 1, Math.floor(this.getDx(step, +this.x1)))
                 const left = Math.ceil(this.getDx(step, +this.x0))
+                if (right < left)
+                    continue
                 count += right - left + 1
+                last = left
             }
         }
         return count
