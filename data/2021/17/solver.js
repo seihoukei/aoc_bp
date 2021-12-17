@@ -12,30 +12,27 @@ class Solver {
 }
 
 class Solver2 extends Solver {
+    getStep(dy, y) {
+        const d = (2 * dy + 1) ** 2 - 8 * y
+        return ((2 * dy + 1) + d ** 0.5) / 2
+    }
+
+    getDx(step, x) {
+        return x / step + (step - 1) / 2
+    }
+
     get result() {
         let count = 0
-        this.x0 = +this.x0
-        this.y0 = +this.y0
-        this.x1 = +this.x1
-        this.y1 = +this.y1
-        for (let dx = 1; dx <= this.x1; dx++)
-            for (let dy = this.y0; dy < -this.y0; dy++) {
-                let x = 0
-                let y = 0
-                let vx = dx
-                let vy = dy
-                while (y >= this.y0) {
-                    x += vx
-                    y += vy
-                    if (vx > 0)
-                        vx--
-                    vy -= 1
-                    if (x >= this.x0 && x <= this.x1 && y >= this.y0 && y <= this.y1) {
-                        count++
-                        break
-                    }
-                }
+
+        for (let dy = +this.y0; dy < -this.y0; dy++) {
+            const start = Math.ceil(this.getStep(dy, +this.y1))
+            const end = Math.floor(this.getStep(dy, +this.y0))
+            for (let step = start; step <= end; step++) {
+                const right = Math.floor(this.getDx(step, +this.x1))
+                const left = Math.ceil(this.getDx(step, +this.x0))
+                count += right - left + 1
             }
+        }
         return count
     }
 }
