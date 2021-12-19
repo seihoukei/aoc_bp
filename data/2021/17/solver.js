@@ -26,6 +26,11 @@ class Solver2 extends Solver {
         return dx2
     }
 
+    stepdata(step) {
+        this.stepdatas ??= []
+        return this.stepdatas[step] ??= [Math.floor(this.getDx(step, +this.x1)), Math.ceil(this.getDx(step, +this.x0))]
+    }
+
     get result() {
         let count = 0
 
@@ -34,8 +39,9 @@ class Solver2 extends Solver {
             const end = Math.floor(this.getStep(dy, +this.y0))
             let last = Infinity
             for (let step = start; step <= end; step++) {
-                const right = Math.min(last - 1, Math.floor(this.getDx(step, +this.x1)))
-                const left = Math.ceil(this.getDx(step, +this.x0))
+                const stepdata = this.stepdata(step)
+                const right = Math.min(last - 1, stepdata[0])
+                const left = stepdata[1]
                 if (right < left)
                     continue
                 count += right - left + 1
@@ -60,3 +66,6 @@ export function part2 (data, raw) {
     return solver.result
 }
 
+
+//target area: x=133..184, y=-142..-85
+//441371460068

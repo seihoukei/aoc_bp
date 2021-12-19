@@ -2,7 +2,7 @@ class Solver {
     bits = ""
 
     constructor(data) {
-        for (let input of data[0]) {
+        for (let input of data) {
             this.bits += `0000${Number(`0x${input}`).toString(2)}`.slice(-4)
         }
         this.packet = this.getPacket()
@@ -89,15 +89,15 @@ class Solver2 extends Solver {
 
 export function part1 (data, raw) {
 //    let solver = new Solver(raw.split(",").map(Number))
-    let solver = new Solver(data)
+    let solvers = data.map(input => new Solver(input))
 
-    return solver.result
+    return solvers.map(x => x.result).join("\n")
 }
 
 export function part2 (data, raw) {
 //    let solver = new Solver2(raw.split(",").map(Number))
-    let solver = new Solver2(data)
+    let solvers = data.map(input => new Solver2(input))
 
-    return solver.result
+    return solvers.map(x => x.result).join("\n")
 }
 
