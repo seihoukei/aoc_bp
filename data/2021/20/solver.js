@@ -14,8 +14,8 @@ class Solver {
 
     step() {
         const empty = this.infinite * 7
-        const newChar = empty ^ 7
         this.infinite = this.algorithm[this.infinite * 511]
+        const newChar = this.infinite * 7
 
         const sx = this.map[0].length
         const sy = this.map.length + 2
