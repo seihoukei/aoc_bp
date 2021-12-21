@@ -1,3 +1,21 @@
+const die = (x) => [0n, ...new Array(x).fill(1n)]
+function combo(die, dice) {
+    const result = new Array(die.length + dice.length - 1).fill(0n)
+    for (let i = 0; i < die.length; i++)
+        for (let j = 0; j < dice.length; j++)
+            result[i+j] += die[i] * dice[j]
+    return result
+}
+function rollChances(number, size) {
+    let x = die(size)
+    let result = die(size)
+    for (let i = 1; i < number; i++)
+        result = combo(result, x)
+    console.log(result)
+    return result
+}
+
+
 class Dice {
     value = 100
     next() {
@@ -45,20 +63,23 @@ class Solver {
 }
 
 class Solver2 {
+    winningScore = 21
+    rolls = rollChances(3, 3)
+
     constructor(data) {
         this.states = {}
-        this.wins = [0, 0]
-        this.add(1, 0, 0, +data[0].split(" ").pop(), +data[1].split(" ").pop(), 0)
+        this.wins = [0n, 0n]
+        this.add(1n, 0, 0, +data[0].split(" ").pop(), +data[1].split(" ").pop(), 0)
     }
 
     add(amount, ...state) {
         const id = state.join(",")
-        this.states[id] = (this.states[id] ?? 0) + amount
+        this.states[id] = (this.states[id] ?? 0n) + amount
     }
 
     get(...state) {
         const id = state.join(",")
-        return this.states[id] ?? 0
+        return this.states[id] ?? 0n
     }
 
     advance(s1, s2, p1, p2, n) {
@@ -66,12 +87,13 @@ class Solver2 {
         if (base === 0)
             return
 
-        const rolls = [0,0,0,1,3,6,7,6,3,1]
-        for (let roll = 3; roll < 10; roll++) {
+        for (let roll = 0; roll < this.rolls.length; roll++) {
+            const outcomes = base * this.rolls[roll]
+            if (outcomes === 0n)
+                continue
             const position = (p1 - 1 + roll) % 10 + 1
             const score = s1 + position
-            const outcomes = base * rolls[roll]
-            if (score >= 21)
+            if (score >= this.winningScore)
                 this.wins[n] += outcomes
             else
                 this.add(outcomes, s2, score, p2, position, 1-n)
@@ -79,8 +101,8 @@ class Solver2 {
     }
 
     get result() {
-        for (let s1 = 0; s1 < 21; s1++)
-            for (let s2 = 0; s2 < 21; s2++)
+        for (let s1 = 0; s1 < this.winningScore; s1++)
+            for (let s2 = 0; s2 < this.winningScore; s2++)
                 for (let p1 = 1; p1 < 11; p1++)
                     for (let p2 = 1; p2 < 11; p2++)
                         for (let n = 0; n < 2; n++)
@@ -88,7 +110,7 @@ class Solver2 {
                                 this.advance(s1, s2, p1, p2,n)
                             else
                                 this.advance(s2, s1, p2, p1,n)
-        return Math.max(...this.wins)
+        return this.wins[0] > this.wins[1] ? this.wins[0] : this.wins[1]
     }
 }
 
