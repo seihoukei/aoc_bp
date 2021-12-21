@@ -45,16 +45,27 @@ class Solver {
 }
 
 class Solver2 {
-    position = []
-    wins = [0, 0]
-
     constructor(data) {
-        for (let input of data) {
-            this.position.push(Number(input.split(" ").pop()))
-        }
+        this.states = {}
+        this.wins = [0, 0]
+        this.add(1, 0, 0, +data[0].split(" ").pop(), +data[1].split(" ").pop(), 0)
     }
 
-    advance(s1, s2, p1, p2, n, base) {
+    add(amount, ...state) {
+        const id = state.join(",")
+        this.states[id] = (this.states[id] ?? 0) + amount
+    }
+
+    get(...state) {
+        const id = state.join(",")
+        return this.states[id] ?? 0
+    }
+
+    advance(s1, s2, p1, p2, n) {
+        const base = this.get(s1, s2, p1, p2, n)
+        if (base === 0)
+            return
+
         const rolls = [0,0,0,1,3,6,7,6,3,1]
         for (let roll = 3; roll < 10; roll++) {
             const position = (p1 - 1 + roll) % 10 + 1
@@ -63,13 +74,21 @@ class Solver2 {
             if (score >= 21)
                 this.wins[n] += outcomes
             else
-                this.advance(s2, score, p2, position, 1-n, outcomes)
+                this.add(outcomes, s2, score, p2, position, 1-n)
         }
     }
 
     get result() {
-        this.advance(0,0,this.position[0],this.position[1], 0, 1)
-        return this.wins.join(",")
+        for (let s1 = 0; s1 < 21; s1++)
+            for (let s2 = 0; s2 < 21; s2++)
+                for (let p1 = 1; p1 < 11; p1++)
+                    for (let p2 = 1; p2 < 11; p2++)
+                        for (let n = 0; n < 2; n++)
+                            if (n)
+                                this.advance(s1, s2, p1, p2,n)
+                            else
+                                this.advance(s2, s1, p2, p1,n)
+        return Math.max(...this.wins)
     }
 }
 
