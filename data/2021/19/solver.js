@@ -53,7 +53,7 @@ class Scanner {
     }
 
     align(scanner, data) {
-        console.log(data)
+        //console.log(data)
         for (let line of data.intersection) {
             if (line[0].split(",")[1] === "0")
                 continue
@@ -68,7 +68,7 @@ class Scanner {
             const dz1 = data.there.z - relativeThere.z
             if (Math.abs(dx0) === Math.abs(dy0) || Math.abs(dz0) === Math.abs(dy0) || Math.abs(dx0) === Math.abs(dz0))
                 continue
-            console.log(dx0, dy0, dz0, dx1, dy1, dz1)
+            //console.log(dx0, dy0, dz0, dx1, dy1, dz1)
 
             const map = [0,0,0,0,0,0,0,0,0]
 
@@ -109,7 +109,7 @@ class Scanner {
             if (dz0 === -dz1)
                 map[8] = -1
 
-            console.log(map)
+            //console.log(map)
 
             for (let signal of scanner.signals) {
                 const old = {
@@ -131,7 +131,7 @@ class Scanner {
                 signal.y += scanner.position.y
                 signal.z += scanner.position.z
             }
-            console.log(scanner.position)
+            //console.log(scanner.position)
             break
         }
 //        console.log(data.here, relativeHere, data.there, relativeThere)
@@ -165,7 +165,7 @@ class Solver {
                     let intersection = this.scanners[i].compare(this.scanners[j])
                     if (!intersection)
                         continue
-                    console.log(i, j)
+                    //console.log(i, j)
                     this.scanners[i].align(this.scanners[j], intersection)
                     locked.add(j)
                 }
