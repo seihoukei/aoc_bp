@@ -1,0 +1,15 @@
+#############
+#...........#
+###B#C#B#D###
+  #D#C#B#A#
+  #D#B#A#C#
+  #A#D#C#A#
+  #########
+
+
+AB C D E FG
+  H I J K
+  L M N O
+  P Q R S
+  T U V W
+
