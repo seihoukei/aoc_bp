@@ -1,11 +1,17 @@
+const POSITIONS = 10
+const MAX_SCORE = 21
+const DICE = 3
+const DIE_SIZE = 3
+
 const die = (x) => [0n, ...new Array(x).fill(1n)]
 function combo(die, dice) {
-    const result = new Array(die.length + dice.length - 1).fill(0n)
+    const result = new Array(POSITIONS).fill(0n)
     for (let i = 0; i < die.length; i++)
         for (let j = 0; j < dice.length; j++)
-            result[i+j] += die[i] * dice[j]
+            result[(i+j) % POSITIONS] += die[i] * dice[j]
     return result
 }
+
 function rollChances(number, size) {
     let x = die(size)
     let result = die(size)
@@ -63,56 +69,58 @@ class Solver {
 }
 
 class Solver2 {
-    winningScore = 21
-    rolls = rollChances(3, 3)
+    rolls = rollChances(DICE, DIE_SIZE)
 
     constructor(data) {
-        this.states = new Array(this.winningScore).fill(0).map(x => new Array(this.winningScore * 200).fill(0n))
+        this.states = new Array(3).fill(0)
+                                  .map(x => new Array(POSITIONS + 1).fill(0)
+                                  .map(x => new Array(MAX_SCORE).fill(0n)
+                                  ))
         this.wins = [0n, 0n]
-        this.add(0, 0, +data[0].split(" ").pop(), +data[1].split(" ").pop(), 0)
+        this.universes = [1n, 1n]
+        this.states[0][+data[0].split(" ").pop()][0] = 1n
+        this.states[1][+data[1].split(" ").pop()][0] = 1n
     }
 
-    add(s1, s2, p1, p2, n, amount = 1n) {
-        const id = ((s2 * 10 + p1 - 1) * 10 + p2 - 1) * 2 + n
-        this.states[s1][id] += amount
+    add(player, position, score, amount = 1n) {
+        this.states[player][position][score] += amount
     }
 
-    get(s1, s2, p1, p2, n) {
-        const id = ((s2 * 10 + p1 - 1) * 10 + p2 - 1) * 2 + n
-        return this.states[s1][id]
+    get(player, position, score) {
+        return this.states[player][position][score]
     }
 
-    advance(s1, s2, p1, p2, n) {
-        const base = this.get(s1, s2, p1, p2, n)
-        if (base === 0)
-            return
+    turn (player) {
+        let universes = 0n
+        for (let line of this.states[2])
+            line.fill(0n)
 
-        for (let roll = 0; roll < this.rolls.length; roll++) {
-            const outcomes = base * this.rolls[roll]
-            if (outcomes === 0n)
-                continue
-            let position = n ? p2 + roll : p1 + roll
-            if (position > 10)
-                position -= 10
-            const score = n ? s2 + position : s1 + position
-            if (score >= this.winningScore)
-                this.wins[n] += outcomes
-            else
-                if (n)
-                    this.add(s1, score, p1, position, 0, outcomes)
-                else
-                    this.add(score, s2, position, p2,1, outcomes)
-        }
+        for (let score = 0; score < MAX_SCORE; score++)
+            for (let position = 1; position <= POSITIONS; position++) {
+                if (this.states[player][position][score] === 0n)
+                    continue
+                for (let roll = 0; roll < this.rolls.length; roll++) {
+                    if (this.rolls[roll] === 0n)
+                        continue
+                    const amount = this.rolls[roll] * this.states[player][position][score]
+                    const newPosition = (position + roll - 1) % POSITIONS + 1
+                    const newScore = score + newPosition
+                    if (newScore >= MAX_SCORE)
+                        this.wins[player] += this.universes[1 - player] * amount
+                    else {
+                        this.states[2][newPosition][newScore] += amount
+                        universes += amount
+                    }
+                }
+            }
+        this.universes[player] = universes
+        ;[this.states[player],this.states[2]] = [this.states[2],this.states[player]]
     }
 
     get result() {
-        for (let s1 = 0; s1 < this.winningScore; s1++) {
-            for (let s2 = 0; s2 < this.winningScore; s2++)
-                for (let p1 = 1; p1 < 11; p1++)
-                    for (let p2 = 1; p2 < 11; p2++)
-                        for (let n = 0; n < 2; n++)
-                            this.advance(s1, s2, p1, p2, n)
-            delete this.states[s1]
+        while (this.universes[0] + this.universes[1] > 0n) {
+            this.turn(0)
+            this.turn(1)
         }
         return this.wins[0] > this.wins[1] ? this.wins[0] : this.wins[1]
     }

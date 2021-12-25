@@ -19,11 +19,16 @@ class DOM {
     }
 }
 
+async function render() {
+    return new Promise(resolve => setTimeout(resolve, 10))
+}
+
 window.onload = async () => {
     document.getElementById("year").innerText = YEAR
     document.getElementById("day").innerText = DAY
 
     for (let input of INPUTS) {
+        await render()
         let file = await fetch(`../data/${YEAR}/${DAY}/${input}`)
         if (file.status === 404) {
             continue
@@ -39,6 +44,7 @@ window.onload = async () => {
 
 
         for (let i = 1; i < 3; i++) {
+            await render()
             performance.clearMarks()
             performance.clearMeasures()
 
@@ -61,7 +67,8 @@ window.onload = async () => {
 
             } catch (e) {
                 DOM.createDiv(dvInput, `error part${i}`, e)
-
+                if (!SAFE)
+                    throw (e)
             }
         }
     }
