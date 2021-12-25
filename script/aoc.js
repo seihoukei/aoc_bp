@@ -24,12 +24,12 @@ async function render() {
 }
 
 window.onload = async () => {
-    document.getElementById("year").innerText = YEAR
-    document.getElementById("day").innerText = DAY
+    document.getElementById("year").innerText = AOC.YEAR
+    document.getElementById("day").innerText = AOC.DAY
 
     for (let input of INPUTS) {
         await render()
-        let file = await fetch(`../data/${YEAR}/${DAY}/${input}`)
+        let file = await fetch(`../data/${AOC.YEAR}/${AOC.DAY}/${input}`)
         if (file.status === 404) {
             continue
         }
@@ -37,7 +37,7 @@ window.onload = async () => {
         const raw = await file.text()
         const data = raw.trim().split(/\r?\n/)
 
-        const solver = (await import(`../data/${YEAR}/${DAY}/${SOLVER}`))
+        const solver = (await import(`../data/${AOC.YEAR}/${AOC.DAY}/${SOLVER}`))
 
         const dvInput = DOM.createDiv(document.body, "input")
         DOM.createDiv(dvInput,"file", new URL(file.url).pathname)
@@ -67,7 +67,7 @@ window.onload = async () => {
 
             } catch (e) {
                 DOM.createDiv(dvInput, `error part${i}`, e)
-                if (!SAFE)
+                if (!AOC.SAFE)
                     throw (e)
             }
         }
